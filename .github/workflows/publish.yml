@@ -10,20 +10,26 @@ jobs:
     name: "publish"
     runs-on: "ubuntu-latest"
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
-      - name: node
-        uses: actions/setup-node@v2
+
+      - name: Checkout
+        uses: actions/checkout@v4.1.7
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4.0.3
         with:
-          node-version: '16.x'
-          registry-url: https://registry.npmjs.org
+          node-version: '20.16.0'
+#          registry-url: https://registry.npmjs.org
+
       - name: Installation
         run: npm install
+
       - name: Building
         run: npm run build
+
       - name: Testing
         run: npm run mocha
-      - name: publish
+
+      - name: Publish to NPM
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_LEXXSOFT_TOKEN}}
