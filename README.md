@@ -1,4 +1,4 @@
-# lexxsoft/odata-query
+# @lexxsoft/odata-http-query
 
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/lexxyar/lexx-odata-query-builder)
 ![GitHub](https://img.shields.io/github/license/lexxyar/lexx-odata-query-builder)
