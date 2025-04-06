@@ -1,24 +1,23 @@
-import {QueryFilterSign} from "./QueryFilterSign";
-import {QueryFilterConcatenate} from "./QueryFilterConcatenate";
+import {TQueryFilterConcatenate, TQueryFilterSign} from "../types";
 
 export class QueryFilter {
     private _field: string = ''
     private _value: string = ''
-    private _option: QueryFilterSign = QueryFilterSign.EQ
-    private _concat: QueryFilterConcatenate = QueryFilterConcatenate.AND
+    private _option: TQueryFilterSign = 'eq'
+    private _concat: TQueryFilterConcatenate = 'and'
     private _childFilter: QueryFilter[] = []
 
-    public static make(field: string | QueryFilter = '', value: any = '', option: QueryFilterSign | string = QueryFilterSign.EQ, concat: QueryFilterConcatenate | string | null = null): QueryFilter {
+    public static make(field: string | QueryFilter = '', value: any = '', option: TQueryFilterSign | string = 'eq', concat: TQueryFilterConcatenate | string | null = null): QueryFilter {
         return new QueryFilter(field, value, option, concat)
     }
 
-    public constructor(field: string | QueryFilter = '', value: any = '', option: QueryFilterSign | string = QueryFilterSign.EQ, concat: QueryFilterConcatenate | string | null = null) {
+    public constructor(field: string | QueryFilter = '', value: any = '', option: TQueryFilterSign | string = 'eq', concat: TQueryFilterConcatenate | string | null = null) {
         if (typeof field === 'string') {
             this._field = field
             this._value = value
-            this._option = option.toLowerCase() as QueryFilterSign
+            this._option = option.toLowerCase() as TQueryFilterSign
             if (concat !== null) {
-                this._concat = concat.toLowerCase() as QueryFilterConcatenate
+                this._concat = concat.toLowerCase() as TQueryFilterConcatenate
             }
         } else {
             this._childFilter.push(field)
@@ -47,45 +46,45 @@ export class QueryFilter {
         return this._option
     }
 
-    public getConcat(): QueryFilterConcatenate {
-        return this._concat.toLowerCase() === 'and' ? QueryFilterConcatenate.AND : QueryFilterConcatenate.OR
+    public getConcat(): TQueryFilterConcatenate {
+        return this._concat.toLowerCase() === 'and' ? 'and' : 'or'
     }
 
-    public concat(value: QueryFilterConcatenate): this {
-        this._concat = value as QueryFilterConcatenate
+    public concat(value: TQueryFilterConcatenate): this {
+        this._concat = value as TQueryFilterConcatenate
         return this
     }
 
-    private _add(filter: QueryFilter, concat: QueryFilterConcatenate = QueryFilterConcatenate.AND): void {
+    private _add(filter: QueryFilter, concat: TQueryFilterConcatenate = 'and'): void {
         filter.concat(concat)
         this._childFilter.push(filter)
     }
 
-    private _toFilter(field: string, value: any = '', option: QueryFilterSign = QueryFilterSign.EQ): QueryFilter {
+    private _toFilter(field: string, value: any = '', option: TQueryFilterSign = 'eq'): QueryFilter {
         return QueryFilter.make(field, value, option)
     }
 
-    public or(filter: QueryFilter | string, value: any = '', option: QueryFilterSign = QueryFilterSign.EQ): this {
+    public or(filter: QueryFilter | string, value: any = '', option: TQueryFilterSign = 'eq'): this {
         if (typeof filter === 'string') {
-            this._add(this._toFilter(filter, value, option), QueryFilterConcatenate.OR)
+            this._add(this._toFilter(filter, value, option), 'or')
         } else {
-            this._add(filter, QueryFilterConcatenate.OR)
+            this._add(filter, 'or')
         }
         return this
     }
 
-    public and(filter: QueryFilter | string, value: any = '', option: QueryFilterSign = QueryFilterSign.EQ): this {
+    public and(filter: QueryFilter | string, value: any = '', option: TQueryFilterSign = 'eq'): this {
         if (typeof filter === 'string') {
-            this._add(this._toFilter(filter, value, option), QueryFilterConcatenate.AND)
+            this._add(this._toFilter(filter, value, option), 'and')
         } else {
-            this._add(filter, QueryFilterConcatenate.AND)
+            this._add(filter, 'and')
         }
         return this
     }
 
-    public addChild(filter: QueryFilter | string, value: any = '', option: QueryFilterSign = QueryFilterSign.EQ): QueryFilter {
+    public addChild(filter: QueryFilter | string, value: any = '', option: TQueryFilterSign = 'eq'): QueryFilter {
         if (typeof filter === 'string') {
-            this._add(this._toFilter(filter, value, option), QueryFilterConcatenate.AND)
+            this._add(this._toFilter(filter, value, option), 'and')
         } else {
             this._add(filter, filter.getConcat())
         }
@@ -111,11 +110,7 @@ export class QueryFilter {
         if (this._field === '') return ''
         const value: string = `'${this._value}'`
         const aResult: string[] = [this._field, this._option, value]
-        if ([
-            QueryFilterSign.SUBSTRINGOF,
-            QueryFilterSign.STARTSWITH,
-            QueryFilterSign.ENDSWITH,
-        ].findIndex((item: string): boolean => this._option === item) >= 0) {
+        if ((['substringof', 'startswith', 'endswith', 'contains'] as TQueryFilterSign[]).findIndex((item: string): boolean => this._option === item) >= 0) {
             aResult[0] = `${this._option}(${this._field}, ${value})`
             aResult[1] = `eq`
             aResult[2] = `true`

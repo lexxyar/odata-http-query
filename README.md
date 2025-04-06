@@ -23,40 +23,99 @@
 # Installation
 
 ```shell script
-npm i lexx-odata-query-builder
+npm i lexxsoft/odata-query
 ```
 
 # Usage
 
-### Basic usage
+## Basic usage
 
-```js
-const o = new QueryBuilder('http://site.com/api/users')
-o.toString()
+```typescript
+const o: QueryBuilder = new QueryBuilder()
 ```
 
-> Output `http://site.com/api/users`
+or
 
-Or with custom query params
-
-```js
-const o = new QueryBuilder('http://site.com/api/users')
-o.querySet('lang', 'en')
-o.toString()
+```typescript
+const o: QueryBuilder = QueryBuilder.make()
 ```
 
-> Output `http://site.com/api/users?lang=en`
+Or create with flow
 
-If you use query builder to create url for axios or another http client, you can pass only path to script, without
-origin
-
-```js
-const o = new QueryBuilder('/users')
-o.querySet('lang', 'en')
-o.toString()
+```typescript
+const o: string = QueryBuilder.make()
+    .querySet('lang', 'en')
+    .toString()
 ```
 
-> Output `/users?lang=en`
+> Output `lang=en`
+
+## Configuration
+
+QueryBuilder has configuration to customize process.
+
+### Markers
+
+QueryBuilder has markers to customize fixed query params. Type for markers shown below:
+
+```typescript
+type TQueryMarkers = {
+    select: string[] | string,
+    limit: string[] | string,
+    offset: string[] | string,
+    order: string[] | string,
+    expand: string[] | string,
+    search: string[] | string,
+    count: string[] | string,
+    filter: string[] | string,
+}
+```
+
+### Markers and corresponding query field
+
+By default, QueryBuilder markers are correspond to OData query field.
+
+```typescript
+const DefaultQueryMarkers: TQueryMarkers = {
+    limit: ['$top', '$limit'],
+    offset: ['$skip', '$offset'],
+    order: ['$orderby', '$order'],
+    expand: '$expand',
+    select: '$select',
+    filter: '$filter',
+    count: '$count',
+    search: '$search',
+}
+```
+
+Of course, you can customize there names as you need.
+For flexibility each marker could have alias. Pass them as array to defaults for correct work. Look at example above.
+
+### Custom configuration
+
+QueryBuilder configuration type:
+
+```typescript
+type TQueryBuilderDefaults = {
+    limit?: number,
+    markers?: TQueryMarkers,
+}
+```
+
+| Field   | Type          | Default               | Description                                               |
+|---------|---------------|-----------------------|-----------------------------------------------------------|
+| limit   | Number        | `undefined`           | Set `limit` to use limitation for every builder instance. |
+| markers | TQueryMarkers | `DefaultQueryMarkers` | Set custom query field name for every marker              |
+
+
+
+
+
+
+
+
+
+
 
 ### Ordering
 
@@ -234,7 +293,9 @@ o.inlineCount()
 > Output `/users?$count=true
 
 ### search
+
 Free-text search parameter, which was added for OData v4.0
+
 ```js
 const o = new QueryBuilder('/users')
 o.search('John Doe')
@@ -301,6 +362,7 @@ consle.log(o.toString())
 > Output `http://site.com/api/users`
 
 Of-cause, you can use this method to parse url with query
+
 ```js
 const o = QueryBuilder.parse(`/users?$count=true`)
 consle.log(o.toString())

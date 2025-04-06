@@ -1,7 +1,7 @@
 {
   "name": "@lexxsoft/odata-query",
-  "version": "2.6.0",
-  "description": "",
+  "version": "1.0.0",
+  "description": "Creating and parsing URL query for OData and more",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -32,6 +32,7 @@
     "istanbul": "^0.4.5",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
+    "ts-node": "^10.9.2",
     "typedoc": "^0.25.7",
     "typescript": "^5.3.3"
   },
