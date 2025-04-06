@@ -23,7 +23,7 @@
 # Installation
 
 ```shell script
-npm i lexxsoft/odata-query
+npm i @lexxsoft/odata-http-query
 ```
 
 # Usage
